@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,6 @@ namespace Genetics
     /// <typeparam name="ParametersType">Тип передаваемых параметров. Должен соответствовать генотипу.</typeparam>
     class GeneticGenerator<Type, ParametersType>    where ParametersType : GeneticParameters
                                                     where Type : Chromosome<ParametersType>, new()
-
     {
         private int inputs, outputs;
         //глобальные параметры
@@ -34,6 +34,10 @@ namespace Genetics
         private Settings settings;
         ParametersType parameters;
         private string mainPath;
+        /// <summary>
+        /// Счетчик для создания папок
+        /// </summary>
+        private int n;
 
         /// Конструктор класса
         public GeneticGenerator(ParametersType parameters, Tuple<int, int> inout, string mainPath = "")
@@ -43,6 +47,24 @@ namespace Genetics
             this.mainPath = mainPath;
             inputs = inout.Item1;
             outputs = inout.Item2;
+
+
+            DirectoryInfo dir = new DirectoryInfo(Settings.datasetPath + "\\Genetic");
+            n = 0;
+            if (dir.Exists)
+            {
+                foreach (var item in dir.GetDirectories())
+                {
+                    string s0 = item.Name;
+                    s0 = s0.Replace(Settings.generationMethodsToPrefix["Genetic"], "");
+                    int jk = s0.IndexOf("_");
+                    if (jk == -1)
+                        jk = s0.Length;
+                    s0 = s0.Substring(0, jk);
+                    if (n <= Int32.Parse(s0))
+                        n = Int32.Parse(s0) + 1;
+                }
+            }
         }
 
         public List<ChromosomeType<Type, ParametersType>> Generate()
@@ -70,10 +92,12 @@ namespace Genetics
             {
                 TruthTable tt = new TruthTable();
                 tt = (dynamic)ttp.chromosome;
+
                 SimpleGenerators tftt = new SimpleGenerators();
                 List<Tuple<string, List<string>>> circs = new List<Tuple<string, List<string>>>();
-                circs.Add(Tuple.Create("CNFT", tftt.cnfFromTruthTable(tt, true)));
-                circs.Add(Tuple.Create("CNFF", tftt.cnfFromTruthTable(tt, false)));
+                circs.Add(Tuple.Create(Settings.generationMethodsToPrefix["Genetic"] + n.ToString(), tftt.cnfFromTruthTable(tt, true)));
+                circs.Add(Tuple.Create(Settings.generationMethodsToPrefix["Genetic"] + (n + 1).ToString(), tftt.cnfFromTruthTable(tt, false)));
+
                 foreach (Tuple<string, List<string>> nameexpr in circs)
                 {
                     string name = nameexpr.Item1;
@@ -87,6 +111,7 @@ namespace Genetics
                     c.circuitName = name;
                     c.generate();
                 }
+                n += 2;
             }
         }
 

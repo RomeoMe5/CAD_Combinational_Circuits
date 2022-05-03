@@ -36,6 +36,7 @@
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.сохранитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.datasetPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.генерацияCsvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnAdd = new System.Windows.Forms.Button();
             this.trvwGenerators = new System.Windows.Forms.TreeView();
@@ -103,7 +104,8 @@
             // 
             this.файлToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.сохранитьToolStripMenuItem,
-            this.datasetPath});
+            this.datasetPath,
+            this.генерацияCsvToolStripMenuItem});
             this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.файлToolStripMenuItem.Text = "Файл";
@@ -121,6 +123,13 @@
             this.datasetPath.Size = new System.Drawing.Size(158, 22);
             this.datasetPath.Text = "Путь к датасету";
             this.datasetPath.Click += new System.EventHandler(this.datasetPathToolStripMenuItem_Click);
+            // 
+            // генерацияCsvToolStripMenuItem
+            // 
+            this.генерацияCsvToolStripMenuItem.Name = "генерацияCsvToolStripMenuItem";
+            this.генерацияCsvToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.генерацияCsvToolStripMenuItem.Text = "Генерация csv";
+            this.генерацияCsvToolStripMenuItem.Click += new System.EventHandler(this.генерацияCsvToolStripMenuItem_Click);
             // 
             // выходToolStripMenuItem
             // 
@@ -322,6 +331,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnGenerate;
         private System.Windows.Forms.Button btnCancelGeneration;
+        private System.Windows.Forms.ToolStripMenuItem генерацияCsvToolStripMenuItem;
     }
 }
 

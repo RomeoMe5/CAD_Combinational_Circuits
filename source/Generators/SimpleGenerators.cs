@@ -134,7 +134,7 @@ namespace Generators
                         else
                         {
                             position--;
-                            j--;
+                            //j--;
                         }
                     }
                     else
@@ -151,7 +151,7 @@ namespace Generators
                         else
                         {
                             position--;
-                            j--;
+                            //j--;
                         }
 
                     }

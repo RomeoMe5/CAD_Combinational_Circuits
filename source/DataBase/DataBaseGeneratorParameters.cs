@@ -1,6 +1,6 @@
 ﻿public enum GenerationTypes
 {
-    CNFFromTruthTable = 0,
+    FromRandomTruthTable = 0,
     RandLevel,
     NumOperation,
     Genetic
@@ -24,7 +24,7 @@ namespace DataBaseGenerators
             minOutputs = 0;
             maxOutputs = 0;
             eachIteration = 0;
-            generationTypes = GenerationTypes.CNFFromTruthTable;
+            generationTypes = GenerationTypes.FromRandomTruthTable;
             generationParameters = new GenerationParameters();
         }
     }

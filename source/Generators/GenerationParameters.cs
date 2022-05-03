@@ -44,6 +44,7 @@ namespace DataBaseGenerators
     }
     public class GenerationParameters
     {
+        public string name;
         public int inputs { get; set; }
         public int outputs { get; set; }
         public int iteration { get; set; }
@@ -56,6 +57,7 @@ namespace DataBaseGenerators
 
         public GenerationParameters()
         {
+            name = "";
             inputs = 0;
             outputs = 0;
             iteration = 0;

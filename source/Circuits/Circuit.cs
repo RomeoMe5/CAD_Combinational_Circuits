@@ -27,12 +27,12 @@ namespace Circuits
         public Circuit(OrientedGraph graph, List<string> logExpressions = null)
         {
             this.graph = graph;
+            this.graph.updateLevels();
             if (logExpressions == null)
                 this.logExpressions = new List<string>();
             else
                 this.logExpressions = logExpressions;
             this.settings = Settings.GetInstance();
-            UpdateCircuitParameters();
         }
         public void UpdateCircuitParameters()
         {            
@@ -63,10 +63,14 @@ namespace Circuits
                         this.circuitParameters.numEdges++;
 
             Reliability R = new Reliability(graph, 0.5);
-            this.circuitParameters.reliability = R.calcReability();
+            Dictionary<string, double> dict = R.runNadezhda(path, circuitName);
+            this.circuitParameters.reliability = dict["reliability_metric"];
+            this.circuitParameters.size = dict["size"];
+            this.circuitParameters.area = dict["area"];
+            this.circuitParameters.longest_path = dict["longest_path"];
 
-            this.circuitParameters.reconvergation = 0; // TODO: 
-            this.circuitParameters.averageDistanceBetweenElements = 0; // TODO:             
+            //this.circuitParameters.reconvergation = 0; // TODO: 
+            //this.circuitParameters.averageDistanceBetweenElements = 0; // TODO:             
 
             this.circuitParameters.numElementsOfEachType = new Dictionary<string, int>();
             List<GraphVertex> gv = graph.Vertices;
@@ -109,9 +113,12 @@ namespace Circuits
             s += string.Format("{0,10}\n", circuitParameters.numOutputs);
             s += string.Format("{0,10}\n", circuitParameters.maxLevel);
             s += string.Format("{0,10}\n", circuitParameters.numEdges);
-            s += string.Format("{0,10}\n", circuitParameters.reconvergation);
+            //s += string.Format("{0,10}\n", circuitParameters.reconvergation);
             s += string.Format("{0,10}\n", circuitParameters.reliability);
-            s += string.Format("{0,10}\n", circuitParameters.averageDistanceBetweenElements);
+            s += string.Format("{0,10}\n", circuitParameters.size);
+            s += string.Format("{0,10}\n", circuitParameters.area);
+            s += string.Format("{0,10}\n", circuitParameters.longest_path);
+            //s += string.Format("{0,10}\n", circuitParameters.averageDistanceBetweenElements);
 
             List<string> keys = circuitParameters.numElementsOfEachType.Keys.ToList<string>();
             keys.Sort();
@@ -140,7 +147,7 @@ namespace Circuits
                 circuitParameters.hashCode = hash;
             }                        
         }
-        public bool GraphToVerilog()
+        public bool GraphToVerilog(string path)
         {
             if (graph == null)
                 return false;
@@ -148,7 +155,7 @@ namespace Circuits
             if (!Directory.Exists(Directory.GetCurrentDirectory()+path))
                 Directory.CreateDirectory(path);
 
-            string fileName = this.path + circuitName + ".v";
+            string fileName = this.path + "\\" + circuitName + ".v";
             List<string> inputs = graph.getVerticesByType("input");
             List<string> outputs = graph.getVerticesByType("output");
             List<string> consts = graph.getVerticesByType("const");
@@ -249,9 +256,7 @@ namespace Circuits
                 return false;
             if (!Directory.Exists(Directory.GetCurrentDirectory() + path))
                 Directory.CreateDirectory(path);
-            string fileName = this.path + circuitName + ".json";
-
-            
+            string fileName = this.path + "\\" + circuitName + ".json";            
 
             if (File.Exists(fileName))
                 File.Delete(fileName);
@@ -267,6 +272,9 @@ namespace Circuits
             writer.WriteLine("\t\"{0}\": {1},", "numEdges", circuitParameters.numEdges);
             //writer.WriteLine("\t\"{0}\": {1},", "reconvergation", circuitParameters.reconvergation);
             writer.WriteLine("\t\"{0}\": {1},", "reliability", circuitParameters.reliability.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "size", circuitParameters.size.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "area", circuitParameters.area.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "longest_path", circuitParameters.longest_path.ToString(CultureInfo.InvariantCulture));
             //writer.WriteLine("\t\"{0}\": {1},", "averageDistanceBetweenElements", circuitParameters.averageDistanceBetweenElements);
             writer.WriteLine("\t\"{0}\": \"{1}\",", "hashCode", circuitParameters.hashCode);
 
@@ -294,14 +302,46 @@ namespace Circuits
 
             return true;
         }
+        private bool checkExistingHash()
+        {
+            string path = this.path.Remove(this.path.LastIndexOf(this.circuitName), this.circuitName.Length) + "hashCodes.txt";
+            if (!File.Exists(path))
+                return false;
+
+            StreamReader sr = new StreamReader(path);
+            string line = sr.ReadLine();
+            while (line != null)
+            {
+                if (line == this.circuitParameters.hashCode)
+                {
+                    sr.Close();
+                    return true;
+                }
+                line = sr.ReadLine();
+            }
+            sr.Close();
+            return false;
+        }
         public bool generate()
         {
-            this.UpdateCircuitParameters();
-            path += this.circuitParameters.hashCode + "\\";
-            if (!this.GraphToVerilog())
+            path += this.circuitName;
+            if (!this.GraphToVerilog(path))
                 return false;
+
+            this.UpdateCircuitParameters();
+
             if (!this.saveParameters())
                 return false;
+
+            if ((this.circuitParameters.reliability == 0) || checkExistingHash())
+                Directory.Delete(path, true);
+            else
+            {
+                string path = this.path.Remove(this.path.LastIndexOf(this.circuitName), this.circuitName.Length) + "hashCodes.txt";
+                StreamWriter sw = new StreamWriter(path, true);
+                sw.WriteLine(this.circuitParameters.hashCode);
+                sw.Close();
+            }
 
             return true;
         }

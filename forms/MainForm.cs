@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using System.Diagnostics;
+using CsvHelper;
+using System.Text;
 
 namespace CombinationalCircuitDatabaseGenerator
 {
@@ -120,7 +122,7 @@ namespace CombinationalCircuitDatabaseGenerator
             node.Nodes.Add(AddNode("Тип генерации", param.generationTypes.ToString()));
             TreeNode node2 = new TreeNode("Параметры генерации");
 
-            if (param.generationTypes == GenerationTypes.CNFFromTruthTable)
+            if (param.generationTypes == GenerationTypes.FromRandomTruthTable)
             {
                 node2.Nodes.Add(AddNode("Ограничение генерации", param.generationParameters.cnfFromTruthTableParameters.generateLimitation));
                 node2.Nodes.Add(AddNode("CNFF", param.generationParameters.cnfFromTruthTableParameters.CNFF));
@@ -206,9 +208,9 @@ namespace CombinationalCircuitDatabaseGenerator
             foreach (var token in obj)
             {
                 //change the display Content of the parent
-                if (token.Key.ToString() == "hashCode")
+                if (token.Key.ToString() == "name")
                 {
-                    parent.Text = token.Value.ToString().Substring(0, 10);
+                    parent.Text = token.Value.ToString();
                     parent.Name = parent.Text;
                 }
                 //create the child node
@@ -285,11 +287,11 @@ namespace CombinationalCircuitDatabaseGenerator
 
         private void UpdateCircuitsList()
         {
-            IEnumerable<string> allfiles = Directory.EnumerateFiles(Settings.datasetPath, "*.v", SearchOption.AllDirectories);
+            IEnumerable<string> allfiles = Directory.EnumerateFiles(Settings.datasetPath, "*.json", SearchOption.AllDirectories);
             trvwCircuits.Nodes.Clear();
             foreach (string filename in allfiles)
             {
-                string s = File.ReadAllText(filename.Replace(".v", ".json"));
+                string s = File.ReadAllText(filename);
                 JObject obj = JObject.Parse(s);      
                 TreeNode parent = Json2Tree(obj);
                 int n = filename.LastIndexOf('.');
@@ -440,6 +442,21 @@ namespace CombinationalCircuitDatabaseGenerator
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.UpdateCircuitsList();
+        }
+
+        private void генерацияCsvToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string filePath = Settings.datasetPath + "\\" + Settings.csvdataset;
+            string delimiter = ",";
+            string[][] output = new string[][]{
+                new string[]{"Col 1 Row 1", "Col 2 Row 1", "Col 3 Row 1"},
+                new string[]{"Col1 Row 2", "Col2 Row 2", "Col3 Row 2"}
+            };
+            int length = output.GetLength(0);
+            StringBuilder sb = new StringBuilder();
+            for (int index = 0; index < length; index++)
+                sb.AppendLine(string.Join(delimiter, output[index]));
+            File.WriteAllText(filePath, sb.ToString());
         }
     }
 }

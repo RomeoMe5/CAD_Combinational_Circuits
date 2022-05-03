@@ -18,6 +18,18 @@ namespace Properties
     [Serializable]
     class Settings
     {
+
+        public static Dictionary<string, string> generationMethodsToPrefix = new Dictionary<string, string>{
+            {"FromRandomTruthTable", "ftt"},
+            {"RandLevel", "rl"},
+            {"NumOperation", "nop"},
+            {"Genetic", "gen"}
+        };
+
+        /// <summary>
+        /// Название файла с базой данных.
+        /// </summary>
+        public static string csvdataset = "dataset.csv";
         /// <summary>
         /// Путь для сохранения настроек.
         /// </summary>
@@ -25,11 +37,24 @@ namespace Properties
         /// <summary>
         /// Путь к папке с датасетом
         /// </summary>
-        public static string datasetPath = "database";
+        public static string datasetPath = Directory.GetCurrentDirectory() + "\\database";
         /// <summary>
         /// Экземпляр настроек.
         /// </summary>
         private static Settings instance;
+        /// <summary>
+        /// Путь к программе рассчета параметров схемы.
+        /// </summary>
+        public static string pathNadezhda = "data\\Nadezhda";
+        /// <summary>
+        /// Словарь с основными путями к файлами программы.
+        /// </summary>
+        public static Dictionary<string, string> nadezhda = new Dictionary<string, string>{ 
+            {"python", ".\\src\\python37-32\\python.exe"},
+            {"resynthesis", "Nadezhda\\Scripts\\resynthesis_local_rewriting.pyc"},
+            {"reliability", "Nadezhda\\Scripts\\check_reliability.pyc"},
+            {"liberty", "Nadezhda\\Test\\Nangate.lib"}
+        };
 
         public static int numThreads { get; private set; }
         

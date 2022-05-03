@@ -109,7 +109,7 @@ namespace CombinationalCircuitDatabaseGenerator.forms
             dbgp.eachIteration = (int)nmrcEachIteration.Value;
             dbgp.generationTypes = gt;
 
-            if (gt == GenerationTypes.CNFFromTruthTable)
+            if (gt == GenerationTypes.FromRandomTruthTable)
             {
                 dbgp.generationParameters.cnfFromTruthTableParameters.generateLimitation = checkBox1.Checked;
                 dbgp.generationParameters.cnfFromTruthTableParameters.CNFF = checkBox3.Checked;

@@ -57,7 +57,7 @@ namespace Graph
                     n = Vertices[n].Level;
                     maxLevel = n > maxLevel ? n : maxLevel;
                 }
-                return vertices.Count; 
+                return maxLevel; 
             }
         }
 

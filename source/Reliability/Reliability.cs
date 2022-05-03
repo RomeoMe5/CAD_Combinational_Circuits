@@ -1,7 +1,13 @@
 ﻿using Graph;
 
+using Newtonsoft.Json.Linq;
+
+using Properties;
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,19 +18,13 @@ namespace Reliabilitys
     {
         OrientedGraph graph;
         double p;
+        private Settings settings;
 
-        public Reliability(OrientedGraph graph, double p)
+        public Reliability(OrientedGraph graph, double p = 0.5)
         {
             this.graph = graph;
             this.p = p;
-        }
-
-        private List<bool> E(List<bool> f, List<bool> fe)
-        {
-            List<bool> list = new List<bool>();
-            for (int i = 0; i < f.Count; i++)
-                list.Add(f[i] == fe[i]);
-            return list;
+            this.settings = Settings.GetInstance();
         }
 
         public Dictionary<string, List<bool>> calc(bool withErrorValues = false, bool withErrorSetting = false)
@@ -71,7 +71,7 @@ namespace Reliabilitys
                     if (result.ContainsKey(r.Key))
                         result[r.Key].Add(r.Value);
                     else
-                        result.Add(r.Key, new List<bool>() { r.Value});
+                        result.Add(r.Key, new List<bool>() { r.Value });
             }
             return result;
         }
@@ -86,18 +86,13 @@ namespace Reliabilitys
                     return false;
             return true;
         }
-        public double calcReability()
+        public double calcReabilityBase()
         {
             double reability = 0;
 
             int inps = graph.getVerticesByType("input").Count;
             int M = graph.getLogicVerticesToWireName().Count;
 
-            if (inps > 2 || M > 3)
-            {
-                Random random = new Random();
-                return random.NextDouble();
-            }
 
             Dictionary<string, List<bool>> dict = this.calc(false, false);
 
@@ -114,7 +109,7 @@ namespace Reliabilitys
             Dictionary<string, List<bool>> dictError = this.calc(false, true);
 
             List<string> outputs = dict.Keys.ToList();
-            
+
             for (int j = 0; j < Math.Pow(2, M); j++)
             {
                 int err = 0;
@@ -133,7 +128,8 @@ namespace Reliabilitys
                 }
                 int t = j;
                 int notNull = 0;
-                while (t > 0) {
+                while (t > 0)
+                {
                     notNull += t % 2 == 1 ? 1 : 0;
                     t /= 2;
                 }
@@ -144,6 +140,77 @@ namespace Reliabilitys
 
 
             return reability / Math.Pow(2, inps);
+        }
+
+        public Dictionary<string, double> runNadezhda(string path, string circuitName)
+        {
+            Dictionary<string, double> dict = new Dictionary<string, double>
+            {
+                {"reliability_metric", 0},
+                {"area", 0},
+                {"size", 0},
+                {"longest_path", 0},
+            };
+            string curPath = Directory.GetCurrentDirectory();
+            Process cmd = new Process();
+            cmd.StartInfo.FileName = "cmd.exe";
+            cmd.StartInfo.RedirectStandardInput = true;
+            cmd.StartInfo.RedirectStandardOutput = true;
+            cmd.StartInfo.CreateNoWindow = true;
+            cmd.StartInfo.UseShellExecute = false;
+            cmd.StartInfo.WorkingDirectory = curPath;
+            cmd.Start();
+
+            cmd.StandardInput.WriteLine("cd " + Settings.pathNadezhda);
+            cmd.StandardInput.Write(Settings.nadezhda["python"] + " ");
+            cmd.StandardInput.Write(Settings.nadezhda["resynthesis"] + " ");
+            cmd.StandardInput.Write(path + "\\" + circuitName + ".v ");
+            cmd.StandardInput.Write(Settings.nadezhda["liberty"] + " ");
+            cmd.StandardInput.Write(path + "\\res ");
+            cmd.StandardInput.Write("-y");
+            cmd.StandardInput.WriteLine();
+            cmd.StandardInput.WriteLine("copy " + path + "\\res\\" + circuitName + "r.v " + path + "\\" + circuitName + "_Nangate.v");
+            cmd.StandardInput.WriteLine("copy " + path + "\\res\\" + circuitName + "_report.json " + path + "\\report.json");
+            cmd.StandardInput.WriteLine("rd /s /q " + path + "\\res");
+            //cmd.StandardInput.WriteLine("rd /s /q " + path + "\\" + circuitName + "_Nangate.v");
+
+            //cmd.StandardInput.Write(Settings.nadezhda["python"] + " ");
+            //cmd.StandardInput.Write(Settings.nadezhda["reliability"] + " ");
+            //cmd.StandardInput.Write(path + "\\" + circuitName + "r.v ");
+            //cmd.StandardInput.Write(Settings.nadezhda["liberty"] + " ");
+            //cmd.StandardInput.Write(path + "\\reportr.txt");
+            //cmd.StandardInput.WriteLine();
+
+            cmd.StandardInput.Flush();
+            cmd.StandardInput.Close();
+            cmd.WaitForExit();
+
+            if (File.Exists(path + "\\report.json")) {
+                string s = File.ReadAllText(path + "\\report.json");
+                JObject obj = JObject.Parse(s);
+                foreach (var token in obj)
+                {
+                    //change the display Content of the parent
+                    if (token.Key.ToString() == "before")
+                    {
+                        foreach (var itm in (JObject)token.Value)
+                        {
+                            if (itm.Key.ToString() == "reliability_metric")
+                                dict[itm.Key.ToString()] = (double)itm.Value;
+                            if (itm.Key.ToString() == "area")
+                                dict[itm.Key.ToString()] = (double)itm.Value;
+                            if (itm.Key.ToString() == "size")
+                                dict[itm.Key.ToString()] = (double)itm.Value;
+                            if (itm.Key.ToString() == "longest_path")
+                                dict[itm.Key.ToString()] = (double)itm.Value;
+                        }
+                    }
+                }
+
+                File.Delete(path + "\\report.json");
+            }
+
+            return dict;
         }
     }
 }
