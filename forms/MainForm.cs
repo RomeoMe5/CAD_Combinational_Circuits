@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using CsvHelper;
 using System.Text;
+using Circuits;
 
 namespace CombinationalCircuitDatabaseGenerator
 {
@@ -448,15 +449,200 @@ namespace CombinationalCircuitDatabaseGenerator
         {
             string filePath = Settings.datasetPath + "\\" + Settings.csvdataset;
             string delimiter = ",";
-            string[][] output = new string[][]{
-                new string[]{"Col 1 Row 1", "Col 2 Row 1", "Col 3 Row 1"},
-                new string[]{"Col1 Row 2", "Col2 Row 2", "Col3 Row 2"}
-            };
-            int length = output.GetLength(0);
+            string[] head = new string[]{
+                "numInputs", "numOutputs", "maxLevel", "numEdges", 
+                "const", "and", "nand", "or", "nor",
+                "not", "xor", "xnor", "buf"};//, "verilog", "verilog_nangate"};
+
+            string[] el_in = new string[]{ "const", "and", "nand", "or", "nor",
+                "not", "xor", "xnor", "buf", "input"};
+            string[] el_out = new string[]{"and", "nand", "or", "nor",
+                "not", "xor", "xnor", "buf", "output"};
+            foreach (string s1 in el_in)
+                foreach (string s2 in el_out)
+                    head = head.Append<string>(s1 + "-" + s2).ToArray();
+
+            head = head.Append<string>("sensitivity_factor_percent").ToArray();
+            head = head.Append<string>("sensitive_area_percent").ToArray();
+
             StringBuilder sb = new StringBuilder();
-            for (int index = 0; index < length; index++)
-                sb.AppendLine(string.Join(delimiter, output[index]));
+            sb.AppendLine(string.Join(delimiter, head));
+
+            IEnumerable<string> allfiles = Directory.EnumerateFiles(Settings.datasetPath, "*.json", SearchOption.AllDirectories);
+            foreach (string filename in allfiles)
+            {
+                string s = File.ReadAllText(filename);
+                JObject obj = JObject.Parse(s);
+                Dictionary<string, string> dict= new Dictionary<string, string>();
+                foreach (string sub in head)
+                    dict.Add(sub, "0");
+                
+                foreach (var token in obj)
+                {
+                    if (head.Contains(token.Key.ToString()))
+                        dict[token.Key.ToString()] = token.Value.ToString().Replace(",", ".");
+
+                    if (token.Value.Type.ToString() == "Object")
+                    {
+                        JObject o = (JObject)token.Value;
+                        foreach (var tok in (JObject)token.Value)
+                        {
+                            if (head.Contains(tok.Key.ToString()))
+                            {
+                                dict[tok.Key.ToString()] = tok.Value.ToString().Replace(",", ".");
+                            }
+                        }
+                    }
+                }
+
+                //dict["verilog"] = string.Join("\n", File.ReadAllLines(filename.Replace(".json", ".v")));
+                //dict["verilog_nangate"] = string.Join("\n", File.ReadAllLines(filename.Replace(".json", "_Nangate.v")));
+
+                string[] ss = new string[head.Length];
+                for (int i = 0; i < head.Length; i++)
+                    ss[i] = dict[head[i]];
+
+                sb.AppendLine(string.Join(delimiter, ss));
+            }
+
             File.WriteAllText(filePath, sb.ToString());
+        }
+
+        private void добавитьСторонниеСхемыToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = Settings.datasetPath;
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                Console.WriteLine("Start parsing");
+                IEnumerable<string> allfiles = Directory.EnumerateFiles(fbd.SelectedPath, "*.v", SearchOption.AllDirectories);
+                foreach (string file in allfiles)
+                {
+                    if (!File.Exists(file.Replace(".v", ".json"))){
+                        string dir = Path.GetDirectoryName(file);
+                        FileInfo fileInfo = new FileInfo(file);
+                        string name = fileInfo.Name;
+                        string name2 = fileInfo.Name.Replace(".v", "_old.v");
+                        File.Copy(Path.Combine(dir, name), Path.Combine(dir, name2), true);
+                        Console.WriteLine(file);
+                        Circuit circuit = AuxiliaryMethods.ParseVerilog(file);
+                        circuit.generate(true);
+                    }
+                }
+                Console.WriteLine("Complete");
+            }
+        }
+
+        private void подсчетНадежностиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = Settings.datasetPath;
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                Console.WriteLine("Start calc");
+                IEnumerable<string> allfiles = Directory.EnumerateFiles(fbd.SelectedPath, "*.v", SearchOption.AllDirectories);
+                foreach (string file in allfiles)
+                {
+                    if (File.Exists(file.Replace(".v", "_Nangate.v")))
+                    {
+                        string path = Path.GetDirectoryName(file);
+                        FileInfo fileInfo = new FileInfo(file);
+                        string circuitName = fileInfo.Name.Replace(".v", "");
+
+                        {
+                            string s = File.ReadAllText(path + "\\" + circuitName + ".json");
+                            if (s.IndexOf("gates") != -1)
+                                continue;
+                        }
+
+                            Dictionary<string, double> dict = new Dictionary<string, double>
+                        {
+                            {"gates", 0},
+                            {"sensitivity_factor", 0},
+                            {"sensitivity_factor_percent", 0},
+                            {"sensitive_area", 0},
+                            {"sensitive_area_percent", 0},
+                        };
+                        string curPath = Directory.GetCurrentDirectory();
+                        Process cmd = new Process();
+                        cmd.StartInfo.FileName = "cmd.exe";
+                        cmd.StartInfo.RedirectStandardInput = true;
+                        cmd.StartInfo.RedirectStandardOutput = true;
+                        cmd.StartInfo.CreateNoWindow = true;
+                        cmd.StartInfo.UseShellExecute = false;
+                        cmd.StartInfo.WorkingDirectory = curPath;
+                        cmd.Start();
+
+                        cmd.StandardInput.WriteLine("cd " + Settings.pathNadezhda);
+                        cmd.StandardInput.Write(Settings.nadezhda["python"] + " ");
+                        cmd.StandardInput.Write(Settings.nadezhda["reliability"] + " ");
+                        cmd.StandardInput.Write(path + "\\" + circuitName + "_Nangate.v ");
+                        cmd.StandardInput.Write(Settings.nadezhda["liberty"] + " ");
+                        cmd.StandardInput.Write(path + "\\report.txt");
+                        cmd.StandardInput.WriteLine();                        
+
+                        cmd.StandardInput.Flush();
+                        cmd.StandardInput.Close();
+                        cmd.WaitForExit();
+
+                        if (File.Exists(path + "\\report.txt"))
+                        {
+                            string s = File.ReadAllText(path + "\\report.txt");
+                            int start = 0;
+                            start = s.IndexOf(": ");
+                            int end = s.IndexOf('\n', start);
+                            string sub = s.Substring(start + 2, end - start - 2);
+                            sub = sub.Replace(".", ",");
+                            dict["gates"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                            start = end;
+
+                            start = s.IndexOf(": ", start);
+                            end = s.IndexOf(' ', start + 2);
+                            sub = s.Substring(start + 2, end - start - 2);
+                            sub = sub.Replace(".", ",");
+                            dict["sensitivity_factor"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                            start = end;
+
+                            start = s.IndexOf(" ", start);
+                            end = s.IndexOf('\n', start + 1);
+                            sub = s.Substring(start + 2, end - start - 5);
+                            sub = sub.Replace(".", ",");
+                            dict["sensitivity_factor_percent"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                            start = end;
+
+                            start = s.IndexOf(": ", start);
+                            end = s.IndexOf(' ', start + 2);
+                            sub = s.Substring(start + 2, end - start - 2);
+                            sub = sub.Replace(".", ",");
+                            dict["sensitive_area"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                            start = end;
+
+                            start = s.IndexOf(" ", start);
+                            end = s.IndexOf('\n', start + 1);
+                            sub = s.Substring(start + 2, end - start - 5);
+                            sub = sub.Replace(".", ",");
+                            dict["sensitive_area_percent"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+
+                            File.Delete(path + "\\report.txt");
+                        }
+                        
+
+                        if (File.Exists(path + "\\" + circuitName + ".json"))
+                        {
+                            string s = File.ReadAllText(path + "\\" + circuitName + ".json");
+                            s = s.Remove(s.LastIndexOf('}'));
+                            s += "	\"gates\": " + Convert.ToInt32(dict["gates"]).ToString() + ",\r\n";
+                            s += "	\"sensitivity_factor\": " + dict["sensitivity_factor"].ToString().Replace(",", ".") + ",\r\n";
+                            s += "	\"sensitivity_factor_percent\": " + dict["sensitivity_factor_percent"].ToString().Replace(",", ".") + ",\r\n";
+                            s += "	\"sensitive_area\": " + dict["sensitive_area"].ToString().Replace(",", ".") + ",\r\n";
+                            s += "	\"sensitive_area_percent\": " + dict["sensitive_area_percent"].ToString().Replace(",", ".") + ",\r\n}";
+
+                            File.WriteAllText(path + "\\" + circuitName + ".json", s);
+                        }
+                    }
+                }
+                Console.WriteLine("Complete");                
+            }
         }
     }
 }

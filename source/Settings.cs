@@ -90,14 +90,15 @@ namespace Properties
             numThreads = 4;
 
             logicOperations = new Dictionary<string, Tuple<string, int>>{
-                { "input",  new Tuple<string, int>("",      9)},
+                { "input",  new Tuple<string, int>("",      10)},
                 { "output", new Tuple<string, int>("=",     0)},
-                { "const",  new Tuple<string, int>("1'b",     8)},
+                { "const",  new Tuple<string, int>("1'b",     9)},
                 { "and",    new Tuple<string, int>("and",   4)},
                 { "nand",   new Tuple<string, int>("nand",  3)},
                 { "or",     new Tuple<string, int>("or",    2)},
                 { "nor",    new Tuple<string, int>("nor",   1)},
                 { "not",    new Tuple<string, int>("not",   7)},
+                { "buf",    new Tuple<string, int>("buf",   8)},
                 { "xor",    new Tuple<string, int>("xor",   6)},
                 { "xnor",   new Tuple<string, int>("xnor",  5)}
             };

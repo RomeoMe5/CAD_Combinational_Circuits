@@ -145,6 +145,9 @@ namespace Generators
                                 case "not":
                                     lst.Add(this.DeleteExtraSpaces(expr.Substring(index + op.Length)));
                                     break;
+                                case "buf":
+                                    lst.Add(this.DeleteExtraSpaces(expr.Substring(index + op.Length)));
+                                    break;
                                 case "input":
                                     lst.Add(this.DeleteExtraSpaces(expr));
                                     break;

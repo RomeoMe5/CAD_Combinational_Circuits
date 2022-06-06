@@ -14,7 +14,12 @@ namespace Circuits
         public double reliability { get; set; }
         public double size { get; set; }
         public double area { get; set; }
-        public double longest_path { get; set; }
+        public int longest_path { get; set; }
+        public int gates { get; set; }
+        public double sensitivity_factor { get; set; }
+        public double sensitivity_factor_percent { get; set; }
+        public double sensitive_area { get; set; }
+        public double sensitive_area_percent { get; set; }
         //public int averageDistanceBetweenElements { get; set; }
         public string hashCode { get; set; }
         public Dictionary<string, int> numElementsOfEachType { get; set; }

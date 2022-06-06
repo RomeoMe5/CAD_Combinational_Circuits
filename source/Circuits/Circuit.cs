@@ -16,7 +16,7 @@ namespace Circuits
     
     class Circuit
     {
-        private OrientedGraph graph { get; set; }
+        public OrientedGraph graph { get; set; }
         public List<string> logExpressions { get; private set; }
         public TruthTable tTable { get; set; }
         public string path { get; set; }
@@ -24,6 +24,11 @@ namespace Circuits
         public CircuitParameters circuitParameters { get; private set; }
         private Settings settings;
 
+        public Circuit()
+        {
+            this.graph = null;
+            this.settings = Settings.GetInstance();
+        }
         public Circuit(OrientedGraph graph, List<string> logExpressions = null)
         {
             this.graph = graph;
@@ -38,6 +43,8 @@ namespace Circuits
         {            
             if (graph == null)
                 return;
+
+            graph.updateLevels();
 
             if (this.circuitParameters == null)
                 this.circuitParameters = new CircuitParameters();
@@ -67,7 +74,13 @@ namespace Circuits
             this.circuitParameters.reliability = dict["reliability_metric"];
             this.circuitParameters.size = dict["size"];
             this.circuitParameters.area = dict["area"];
-            this.circuitParameters.longest_path = dict["longest_path"];
+            this.circuitParameters.longest_path = Convert.ToInt32(dict["longest_path"]);
+
+            this.circuitParameters.gates = Convert.ToInt32(dict["gates"]);
+            this.circuitParameters.sensitivity_factor = dict["sensitivity_factor"];
+            this.circuitParameters.sensitivity_factor_percent = dict["sensitivity_factor_percent"];
+            this.circuitParameters.sensitive_area = dict["sensitive_area"];
+            this.circuitParameters.sensitive_area_percent = dict["sensitive_area_percent"];            
 
             //this.circuitParameters.reconvergation = 0; // TODO: 
             //this.circuitParameters.averageDistanceBetweenElements = 0; // TODO:             
@@ -117,7 +130,11 @@ namespace Circuits
             s += string.Format("{0,10}\n", circuitParameters.reliability);
             s += string.Format("{0,10}\n", circuitParameters.size);
             s += string.Format("{0,10}\n", circuitParameters.area);
-            s += string.Format("{0,10}\n", circuitParameters.longest_path);
+            s += string.Format("{0,10}\n", circuitParameters.gates);
+            s += string.Format("{0,10}\n", circuitParameters.sensitive_area);
+            s += string.Format("{0,10}\n", circuitParameters.sensitive_area_percent);
+            s += string.Format("{0,10}\n", circuitParameters.sensitivity_factor);
+            s += string.Format("{0,10}\n", circuitParameters.sensitivity_factor_percent);
             //s += string.Format("{0,10}\n", circuitParameters.averageDistanceBetweenElements);
 
             List<string> keys = circuitParameters.numElementsOfEachType.Keys.ToList<string>();
@@ -147,14 +164,16 @@ namespace Circuits
                 circuitParameters.hashCode = hash;
             }                        
         }
-        public bool GraphToVerilog(string path)
+        public bool GraphToVerilog(string path, bool pathExists = false)
         {
             if (graph == null)
                 return false;
 
-            if (!Directory.Exists(Directory.GetCurrentDirectory()+path))
-                Directory.CreateDirectory(path);
-
+            if (!pathExists)
+            {
+                if (!Directory.Exists(Directory.GetCurrentDirectory() + path))
+                    Directory.CreateDirectory(path);
+            }
             string fileName = this.path + "\\" + circuitName + ".v";
             List<string> inputs = graph.getVerticesByType("input");
             List<string> outputs = graph.getVerticesByType("output");
@@ -166,8 +185,9 @@ namespace Circuits
             FileStream file = new FileStream(fileName, FileMode.CreateNew);
             StreamWriter writer = new StreamWriter(file);
 
-            for (int i = 0; i < logExpressions.Count; i++)
-                writer.WriteLine($"//{logExpressions[i]}");
+            if (logExpressions != null)
+                for (int i = 0; i < logExpressions.Count; i++)
+                    writer.WriteLine($"//{logExpressions[i]}");
 
 
             StringBuilder sb = new StringBuilder();
@@ -250,12 +270,13 @@ namespace Circuits
             file.Close();
             return true;
         }
-        public bool saveParameters()
+        public bool saveParameters(bool pathExists = false)
         {
             if (graph == null)
                 return false;
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + path))
-                Directory.CreateDirectory(path);
+            if (!pathExists)
+                if (!Directory.Exists(Directory.GetCurrentDirectory() + path))
+                    Directory.CreateDirectory(path);
             string fileName = this.path + "\\" + circuitName + ".json";            
 
             if (File.Exists(fileName))
@@ -275,6 +296,11 @@ namespace Circuits
             writer.WriteLine("\t\"{0}\": {1},", "size", circuitParameters.size.ToString(CultureInfo.InvariantCulture));
             writer.WriteLine("\t\"{0}\": {1},", "area", circuitParameters.area.ToString(CultureInfo.InvariantCulture));
             writer.WriteLine("\t\"{0}\": {1},", "longest_path", circuitParameters.longest_path.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "gates", circuitParameters.gates.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "sensitivity_factor", circuitParameters.sensitivity_factor.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "sensitivity_factor_percent", circuitParameters.sensitivity_factor_percent.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "sensitive_area", circuitParameters.sensitive_area.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "sensitive_area_percent", circuitParameters.sensitive_area_percent.ToString(CultureInfo.InvariantCulture));
             //writer.WriteLine("\t\"{0}\": {1},", "averageDistanceBetweenElements", circuitParameters.averageDistanceBetweenElements);
             writer.WriteLine("\t\"{0}\": \"{1}\",", "hashCode", circuitParameters.hashCode);
 
@@ -304,7 +330,8 @@ namespace Circuits
         }
         private bool checkExistingHash()
         {
-            string path = this.path.Remove(this.path.LastIndexOf(this.circuitName), this.circuitName.Length) + "hashCodes.txt";
+            var dir = new DirectoryInfo(this.path);
+            string path = dir.Parent.FullName;
             if (!File.Exists(path))
                 return false;
 
@@ -322,22 +349,26 @@ namespace Circuits
             sr.Close();
             return false;
         }
-        public bool generate()
+        public bool generate(bool pathExists = false)
         {
-            path += this.circuitName;
-            if (!this.GraphToVerilog(path))
+            if (!pathExists)
+                path += this.circuitName;
+            if (!this.GraphToVerilog(path, pathExists))
                 return false;
 
             this.UpdateCircuitParameters();
 
             if (!this.saveParameters())
                 return false;
-
-            if ((this.circuitParameters.reliability == 0) || checkExistingHash())
-                Directory.Delete(path, true);
+            if (checkExistingHash() || (this.circuitParameters.reliability == 0) || (this.circuitParameters.gates == 0))
+            {
+                if (!pathExists)
+                    Directory.Delete(path, true);
+            }
             else
             {
-                string path = this.path.Remove(this.path.LastIndexOf(this.circuitName), this.circuitName.Length) + "hashCodes.txt";
+                var dir = new DirectoryInfo(this.path);
+                string path = dir.Parent.FullName + "\\hashCodes.txt";
                 StreamWriter sw = new StreamWriter(path, true);
                 sw.WriteLine(this.circuitParameters.hashCode);
                 sw.Close();

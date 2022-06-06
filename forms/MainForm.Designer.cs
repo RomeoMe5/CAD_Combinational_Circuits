@@ -37,6 +37,8 @@
             this.сохранитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.datasetPath = new System.Windows.Forms.ToolStripMenuItem();
             this.генерацияCsvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.добавитьСторонниеСхемыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.подсчетНадежностиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnAdd = new System.Windows.Forms.Button();
             this.trvwGenerators = new System.Windows.Forms.TreeView();
@@ -105,7 +107,9 @@
             this.файлToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.сохранитьToolStripMenuItem,
             this.datasetPath,
-            this.генерацияCsvToolStripMenuItem});
+            this.генерацияCsvToolStripMenuItem,
+            this.добавитьСторонниеСхемыToolStripMenuItem,
+            this.подсчетНадежностиToolStripMenuItem});
             this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.файлToolStripMenuItem.Text = "Файл";
@@ -113,23 +117,37 @@
             // сохранитьToolStripMenuItem
             // 
             this.сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
             this.сохранитьToolStripMenuItem.Text = "Обновить";
             this.сохранитьToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
             // 
             // datasetPath
             // 
             this.datasetPath.Name = "datasetPath";
-            this.datasetPath.Size = new System.Drawing.Size(158, 22);
+            this.datasetPath.Size = new System.Drawing.Size(227, 22);
             this.datasetPath.Text = "Путь к датасету";
             this.datasetPath.Click += new System.EventHandler(this.datasetPathToolStripMenuItem_Click);
             // 
             // генерацияCsvToolStripMenuItem
             // 
             this.генерацияCsvToolStripMenuItem.Name = "генерацияCsvToolStripMenuItem";
-            this.генерацияCsvToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.генерацияCsvToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
             this.генерацияCsvToolStripMenuItem.Text = "Генерация csv";
             this.генерацияCsvToolStripMenuItem.Click += new System.EventHandler(this.генерацияCsvToolStripMenuItem_Click);
+            // 
+            // добавитьСторонниеСхемыToolStripMenuItem
+            // 
+            this.добавитьСторонниеСхемыToolStripMenuItem.Name = "добавитьСторонниеСхемыToolStripMenuItem";
+            this.добавитьСторонниеСхемыToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+            this.добавитьСторонниеСхемыToolStripMenuItem.Text = "Добавить сторонние схемы";
+            this.добавитьСторонниеСхемыToolStripMenuItem.Click += new System.EventHandler(this.добавитьСторонниеСхемыToolStripMenuItem_Click);
+            // 
+            // подсчетНадежностиToolStripMenuItem
+            // 
+            this.подсчетНадежностиToolStripMenuItem.Name = "подсчетНадежностиToolStripMenuItem";
+            this.подсчетНадежностиToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+            this.подсчетНадежностиToolStripMenuItem.Text = "Подсчет надежности";
+            this.подсчетНадежностиToolStripMenuItem.Click += new System.EventHandler(this.подсчетНадежностиToolStripMenuItem_Click);
             // 
             // выходToolStripMenuItem
             // 
@@ -332,6 +350,8 @@
         private System.Windows.Forms.Button btnGenerate;
         private System.Windows.Forms.Button btnCancelGeneration;
         private System.Windows.Forms.ToolStripMenuItem генерацияCsvToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem добавитьСторонниеСхемыToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem подсчетНадежностиToolStripMenuItem;
     }
 }
 

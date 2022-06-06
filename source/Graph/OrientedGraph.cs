@@ -122,11 +122,14 @@ namespace Graph
         /// Добавление вершины
         /// </summary>
         /// <param logicExpression="vertexName">Имя вершины</param>
-        public bool addVertex(string vertexName, string operation)
+        public bool addVertex(string vertexName, string operation, string wireName = null)
         {
             if (this.getIndexOfExpression(vertexName) != -1)
                 return false;
-            vertices.Add(new GraphVertex(vertexName, operation));
+            if (wireName == null)
+                vertices.Add(new GraphVertex(vertexName, operation));
+            else
+                vertices.Add(new GraphVertex(vertexName, operation, false, wireName));
             for (int i = 0; i < vertices.Count - 1; i++)
                 adjacencyMatrix[i].Add(false);
             adjacencyMatrix.Add(new List<bool>());
@@ -140,10 +143,21 @@ namespace Graph
         /// </summary>
         /// <param logicExpression="vertexFrom">Имя первой вершины</param>
         /// <param logicExpression="vertexTo">Имя второй вершины</param>
-        public bool addEdge(string vertexFrom, string vertexTo)
+        public bool addEdge(string vertexFrom, string vertexTo, bool isExpression = true)
         {
-            int v1 = this.getIndexOfExpression(vertexFrom);
-            int v2 = this.getIndexOfExpression(vertexTo);
+            int v1 = -1;
+            int v2 = -1;
+            if (isExpression)
+            {
+                v1 = this.getIndexOfExpression(vertexFrom);
+                v2 = this.getIndexOfExpression(vertexTo);
+            }
+            else
+            {
+                v1 = this.getIndexOfWireName(vertexFrom);
+                v2 = this.getIndexOfWireName(vertexTo);
+            }
+
             if (v1 != -1 && v2 != -1)
             {
                 vertices[v2].Level = Math.Max(vertices[v1].Level + 1, vertices[v2].Level);
@@ -158,11 +172,24 @@ namespace Graph
         /// </summary>
         /// <param logicExpression="vertexFrom">Имя первой вершины</param>
         /// <param logicExpression="vertexTo">Имя второй вершины</param>
-        public bool addDoubleEdge(string vertexFromFirst, string vertexFromSecond, string vertexTo)
+        public bool addDoubleEdge(string vertexFromFirst, string vertexFromSecond, string vertexTo, bool isExpression = true)
         {
-            int v1 = this.getIndexOfExpression(vertexFromFirst);
-            int v2 = this.getIndexOfExpression(vertexFromSecond);
-            int v3 = this.getIndexOfExpression(vertexTo);
+            int v1 = -1;
+            int v2 = -1;
+            int v3 = -1;
+            if (isExpression)
+            {
+                v1 = this.getIndexOfExpression(vertexFromFirst);
+                v2 = this.getIndexOfExpression(vertexFromSecond);
+                v3 = this.getIndexOfExpression(vertexTo);
+            }
+            else
+            {
+                v1 = this.getIndexOfWireName(vertexFromFirst);
+                v2 = this.getIndexOfWireName(vertexFromSecond);
+                v3 = this.getIndexOfWireName(vertexTo);
+            }
+
             if (v1 != -1 && v2 != -1 && v3 != -1)
             {
                 vertices[v3].Level = Math.Max(vertices[v1].Level + 1, vertices[v3].Level);
@@ -315,6 +342,11 @@ namespace Graph
                 case "not":
                     {
                         res = !inputs[0];
+                        break;
+                    }
+                case "buf":
+                    {
+                        res = inputs[0];
                         break;
                     }
                 case "and":

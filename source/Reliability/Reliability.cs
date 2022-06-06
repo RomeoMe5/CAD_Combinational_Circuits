@@ -4,6 +4,8 @@ using Newtonsoft.Json.Linq;
 
 using Properties;
 
+using source;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -150,6 +152,11 @@ namespace Reliabilitys
                 {"area", 0},
                 {"size", 0},
                 {"longest_path", 0},
+                {"gates", 0},
+                {"sensitivity_factor", 0},
+                {"sensitivity_factor_percent", 0},
+                {"sensitive_area", 0},
+                {"sensitive_area_percent", 0},
             };
             string curPath = Directory.GetCurrentDirectory();
             Process cmd = new Process();
@@ -172,6 +179,13 @@ namespace Reliabilitys
             cmd.StandardInput.WriteLine("copy " + path + "\\res\\" + circuitName + "r.v " + path + "\\" + circuitName + "_Nangate.v");
             cmd.StandardInput.WriteLine("copy " + path + "\\res\\" + circuitName + "_report.json " + path + "\\report.json");
             cmd.StandardInput.WriteLine("rd /s /q " + path + "\\res");
+
+            cmd.StandardInput.Write(Settings.nadezhda["python"] + " ");
+            cmd.StandardInput.Write(Settings.nadezhda["reliability"] + " ");
+            cmd.StandardInput.Write(path + "\\" + circuitName + "_Nangate.v ");
+            cmd.StandardInput.Write(Settings.nadezhda["liberty"] + " ");
+            cmd.StandardInput.Write(path + "\\report.txt");
+            cmd.StandardInput.WriteLine();
             //cmd.StandardInput.WriteLine("rd /s /q " + path + "\\" + circuitName + "_Nangate.v");
 
             //cmd.StandardInput.Write(Settings.nadezhda["python"] + " ");
@@ -206,9 +220,49 @@ namespace Reliabilitys
                         }
                     }
                 }
-
-                File.Delete(path + "\\report.json");
+                File.Delete(path + "\\report.json");                
             }
+
+            if (File.Exists(path + "\\report.txt"))
+            {
+                string s = File.ReadAllText(path + "\\report.txt");
+                int start = 0;
+                start = s.IndexOf(": ");
+                int end = s.IndexOf('\n', start);
+                string sub = s.Substring(start + 2, end - start - 2);
+                sub = sub.Replace(".", ",");
+                dict["gates"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                start = end;
+
+                start = s.IndexOf(": ", start);
+                end = s.IndexOf(' ', start + 2);
+                sub = s.Substring(start + 2, end - start - 2);
+                sub = sub.Replace(".", ",");
+                dict["sensitivity_factor"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                start = end;
+
+                start = s.IndexOf(" ", start);
+                end = s.IndexOf('\n', start + 1);
+                sub = s.Substring(start + 2, end - start - 5);
+                sub = sub.Replace(".", ",");
+                dict["sensitivity_factor_percent"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                start = end;
+
+                start = s.IndexOf(": ", start);
+                end = s.IndexOf(' ', start + 2);
+                sub = s.Substring(start + 2, end - start - 2);
+                sub = sub.Replace(".", ",");
+                dict["sensitive_area"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+                start = end;
+
+                start = s.IndexOf(" ", start);
+                end = s.IndexOf('\n', start + 1);
+                sub = s.Substring(start + 2, end - start - 5);
+                sub = sub.Replace(".", ",");
+                dict["sensitive_area_percent"] = Convert.ToDouble(AuxiliaryMethods.RemoveSpaces(sub));
+
+                File.Delete(path + "\\report.txt");
+            }            
 
             return dict;
         }

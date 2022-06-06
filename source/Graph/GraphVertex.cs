@@ -18,7 +18,7 @@ namespace Graph
         /// Описание основных переменных класса.
         /// </summary>
         private string logicExpression;
-        private string operation;
+        public string operation;
         private int level = 0;
         private bool value = false;
         private string wireName = "wr";
@@ -31,7 +31,7 @@ namespace Graph
         /// </summary>
         /// <param name="expr">Итоговое логическое выражения</param>
         /// <param name="operation">Выполняемая логическая операция</param>
-        public GraphVertex(string expr, string operation, bool value = false)
+        public GraphVertex(string expr, string operation, bool value = false, string wireName = null)
         {
             this.logicExpression = expr;
             this.operation = operation;
@@ -40,7 +40,10 @@ namespace Graph
             if (operation == "input" || operation == "output" || operation == "const")
                 this.wireName = expr;
             else
-                this.wireName = this.wireName + $"{count++}";
+                if (wireName == null)
+                this.wireName += $"{count++}";
+            else
+                this.wireName = wireName;
         }
 
         public int Level

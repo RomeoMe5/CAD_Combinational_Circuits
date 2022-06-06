@@ -142,7 +142,6 @@ namespace Generators
                         ch1 = rand.Next(previndex, currentindex);
                         ch2 = rand.Next(previndex, currentindex);
 
-
                         expression = "(" + graph.Vertices[ch2].LogicExpression + ") " + settings.operationsToName[logoper[choice]] + " (" + graph.Vertices[ch1].LogicExpression + ")";
                         if (graph.addVertex(expression, logoper[choice]))
                         {
