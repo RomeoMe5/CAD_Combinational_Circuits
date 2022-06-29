@@ -78,7 +78,7 @@ namespace Circuits
 
             this.circuitParameters.gates = Convert.ToInt32(dict["gates"]);
             this.circuitParameters.sensitivity_factor = dict["sensitivity_factor"];
-            this.circuitParameters.sensitivity_factor_percent = dict["sensitivity_factor_percent"];
+            this.circuitParameters.reliability_percent = dict["sensitivity_factor_percent"];
             this.circuitParameters.sensitive_area = dict["sensitive_area"];
             this.circuitParameters.sensitive_area_percent = dict["sensitive_area_percent"];            
 
@@ -134,7 +134,7 @@ namespace Circuits
             s += string.Format("{0,10}\n", circuitParameters.sensitive_area);
             s += string.Format("{0,10}\n", circuitParameters.sensitive_area_percent);
             s += string.Format("{0,10}\n", circuitParameters.sensitivity_factor);
-            s += string.Format("{0,10}\n", circuitParameters.sensitivity_factor_percent);
+            s += string.Format("{0,10}\n", circuitParameters.reliability_percent);
             //s += string.Format("{0,10}\n", circuitParameters.averageDistanceBetweenElements);
 
             List<string> keys = circuitParameters.numElementsOfEachType.Keys.ToList<string>();
@@ -298,7 +298,7 @@ namespace Circuits
             writer.WriteLine("\t\"{0}\": {1},", "longest_path", circuitParameters.longest_path.ToString(CultureInfo.InvariantCulture));
             writer.WriteLine("\t\"{0}\": {1},", "gates", circuitParameters.gates.ToString(CultureInfo.InvariantCulture));
             writer.WriteLine("\t\"{0}\": {1},", "sensitivity_factor", circuitParameters.sensitivity_factor.ToString(CultureInfo.InvariantCulture));
-            writer.WriteLine("\t\"{0}\": {1},", "sensitivity_factor_percent", circuitParameters.sensitivity_factor_percent.ToString(CultureInfo.InvariantCulture));
+            writer.WriteLine("\t\"{0}\": {1},", "sensitivity_factor_percent", circuitParameters.reliability_percent.ToString(CultureInfo.InvariantCulture));
             writer.WriteLine("\t\"{0}\": {1},", "sensitive_area", circuitParameters.sensitive_area.ToString(CultureInfo.InvariantCulture));
             writer.WriteLine("\t\"{0}\": {1},", "sensitive_area_percent", circuitParameters.sensitive_area_percent.ToString(CultureInfo.InvariantCulture));
             //writer.WriteLine("\t\"{0}\": {1},", "averageDistanceBetweenElements", circuitParameters.averageDistanceBetweenElements);

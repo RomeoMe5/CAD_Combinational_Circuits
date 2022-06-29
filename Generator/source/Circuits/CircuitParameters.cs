@@ -17,7 +17,7 @@ namespace Circuits
         public int longest_path { get; set; }
         public int gates { get; set; }
         public double sensitivity_factor { get; set; }
-        public double sensitivity_factor_percent { get; set; }
+        public double reliability_percent { get; set; }
         public double sensitive_area { get; set; }
         public double sensitive_area_percent { get; set; }
         //public int averageDistanceBetweenElements { get; set; }

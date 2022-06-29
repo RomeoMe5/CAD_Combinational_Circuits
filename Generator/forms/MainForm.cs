@@ -462,7 +462,7 @@ namespace CombinationalCircuitDatabaseGenerator
                 foreach (string s2 in el_out)
                     head = head.Append<string>(s1 + "-" + s2).ToArray();
 
-            head = head.Append<string>("sensitivity_factor_percent").ToArray();
+            head = head.Append<string>("reliability_percent").ToArray();
             //head = head.Append<string>("sensitive_area_percent").ToArray();
 
             StringBuilder sb = new StringBuilder();
