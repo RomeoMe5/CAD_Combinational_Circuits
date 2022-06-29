@@ -450,7 +450,7 @@ namespace CombinationalCircuitDatabaseGenerator
             string filePath = Settings.datasetPath + "\\" + Settings.csvdataset;
             string delimiter = ",";
             string[] head = new string[]{
-                "numInputs", "numOutputs", "maxLevel", "numEdges", 
+                "numInputs", "numOutputs", "maxLevel",
                 "const", "and", "nand", "or", "nor",
                 "not", "xor", "xnor", "buf"};//, "verilog", "verilog_nangate"};
 
@@ -463,7 +463,7 @@ namespace CombinationalCircuitDatabaseGenerator
                     head = head.Append<string>(s1 + "-" + s2).ToArray();
 
             head = head.Append<string>("sensitivity_factor_percent").ToArray();
-            head = head.Append<string>("sensitive_area_percent").ToArray();
+            //head = head.Append<string>("sensitive_area_percent").ToArray();
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(string.Join(delimiter, head));
