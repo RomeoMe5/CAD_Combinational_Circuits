@@ -1,6 +1,6 @@
 # ENG
 
-## Investigation of the reliability of combinational circuits
+## Research on the reliability of combinational circuits
 This project was created to study the reliability of combinational circuits using various methods, including using machine learning methods.
 
 ### Contents
