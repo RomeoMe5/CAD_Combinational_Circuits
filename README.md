@@ -1,6 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6783568.svg)](https://doi.org/10.5281/zenodo.6783568)
+
 # ENG
-## doi   
-https://doi.org/10.5281/zenodo.6783567    
 
 ## Combinational circuits: reliability
 This project was created to study the reliability of combinational circuits using various methods, including using machine learning methods.
