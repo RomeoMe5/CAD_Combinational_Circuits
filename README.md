@@ -1,6 +1,6 @@
 # ENG
 
-## Research on the reliability of combinational circuits
+## Combinational circuits: reliability
 This project was created to study the reliability of combinational circuits using various methods, including using machine learning methods.
 
 ### Contents
@@ -9,26 +9,26 @@ This project was created to study the reliability of combinational circuits usin
 2. [Dataset of combinational circuits](#dataset_eng)
 3. [Dataset usage examples](#examples_eng)
 
-
 ### Program for generating combinational circuits
 <a name="programm_eng"></a> 
-The first part of this repository is a program for generating combinational circuits in Verilog format and calculating their main parameters.
-The source code of the program can be found [here](Generator).
+Program for generating combinational circuits in Verilog format and calculation of their main parameters.   
+Source code: [here](Generator).
 
 [&#8593; Contents](#content_eng)
 
-
 ### Dataset of combinational circuits
 <a name="dataset_eng"></a> 
-Using the developed program, a dataset of combinational circuits was generated. The dataset is presented in CSV format.
-The dataset and its description are located [here](Dataset).
+Dataset of combinational circuits was generated using [Generator](Generator).     
+Dataset is presented in CSV format. 
+Dataset and its description are located [here](Dataset).
 
 [&#8593; Contents](#content_eng)
 
 
 ### Dataset usage examples
 <a name="examples_eng"></a> 
-To determine the suitability of the developed methods and combinational circuits generated as a result of their work, for use in machine learning, two algorithms were developed, which allow predicting the reliability of combinational circuits based on training on the dataset generated. The XGBoost algorithm. was chosen as the first idea for implementing a method for assessing the reliability of combinational circuits using machine learning. This algorithm is a machine learning algorithm based on a decision tree and using the gradient boosting framework. It has gained a lot of popularity as the algorithm chosen by many winning teams in many machine learning competitions. As the second method for calculating reliability, a regression neural network was chosen, which analyzes the parameters of the circuit and calculates its reliability.
+To determine the suitability of the methods (CCGRTT, CCGRCG, CCGRVC, CCGGA) and combinational circuits generated as a result of their work, for use in machine learning, two algorithms were developed, which allow predicting the reliability of combinational circuits based on training on the dataset generated. The XGBoost algorithm. was chosen as the first idea for implementing a method for assessing the reliability of combinational circuits using machine learning. This algorithm is a machine learning algorithm based on a decision tree and using the gradient boosting framework. It has gained a lot of popularity as the algorithm chosen by many winning teams in many machine learning competitions.    
+As the second method for calculating reliability, a regression neural network was chosen, which analyzes the parameters of the circuit and calculates its reliability.    
 Examples of using the dataset are [here](Prediction).
 
 [&#8593; Contents](#content_eng)
