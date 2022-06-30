@@ -12,7 +12,7 @@ This project was created to study the reliability of combinational circuits usin
 ### Program for generating combinational circuits
 <a name="programm_eng"></a> 
 Program for generating combinational circuits in Verilog format and calculation of their main parameters.   
-Source code: [here](Generator).
+Source code: [Generator](Generator).
 
 [&#8593; Contents](#content_eng)
 
@@ -20,7 +20,7 @@ Source code: [here](Generator).
 <a name="dataset_eng"></a> 
 Dataset of combinational circuits was generated using [Generator](Generator).     
 Dataset is presented in CSV format. 
-Dataset and its description are located [here](Dataset).
+Dataset and its description are located in [Dataset](Dataset).
 
 [&#8593; Contents](#content_eng)
 
@@ -29,7 +29,7 @@ Dataset and its description are located [here](Dataset).
 <a name="examples_eng"></a> 
 To determine the suitability of the methods (CCGRTT, CCGRCG, CCGRVC, CCGGA) and combinational circuits generated as a result of their work, for use in machine learning, two algorithms were developed, which allow predicting the reliability of combinational circuits based on training on the dataset generated. The XGBoost algorithm. was chosen as the first idea for implementing a method for assessing the reliability of combinational circuits using machine learning. This algorithm is a machine learning algorithm based on a decision tree and using the gradient boosting framework. It has gained a lot of popularity as the algorithm chosen by many winning teams in many machine learning competitions.    
 As the second method for calculating reliability, a regression neural network was chosen, which analyzes the parameters of the circuit and calculates its reliability.    
-Examples of using the dataset are [here](Prediction).
+Examples of using the dataset are located in [Prediction](Prediction).
 
 [&#8593; Contents](#content_eng)
 
