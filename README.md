@@ -1,4 +1,9 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6783568.svg)](https://doi.org/10.5281/zenodo.6783568)
+![Lines of code](https://img.shields.io/tokei/lines/github/RomeoMe5/CAD_Combinational_Circuits)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/RomeoMe5/CAD_Combinational_Circuits)
+![GitHub last commit](https://img.shields.io/github/last-commit/RomeoMe5/CAD_Combinational_Circuits)
+![GitHub forks](https://img.shields.io/github/forks/RomeoMe5/CAD_Combinational_Circuits)
+![GitHub Repo stars](https://img.shields.io/github/stars/RomeoMe5/CAD_Combinational_Circuits)
 
 # ENG
 
