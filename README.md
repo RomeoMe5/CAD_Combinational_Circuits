@@ -5,6 +5,10 @@
 ![GitHub forks](https://img.shields.io/github/forks/RomeoMe5/CAD_Combinational_Circuits)
 ![GitHub Repo stars](https://img.shields.io/github/stars/RomeoMe5/CAD_Combinational_Circuits)
 
+# REF   
+To cite this dataset, please use reference:
+V. V. Zunin, A. Y. Romanov and R. A. Solovyev, "Developing Methods for Combinational Circuit Generation," 2022 International Russian Automation Conference (RusAutoCon), Sochi, Russian Federation, 2022, pp. 842-846, doi: https://doi.org/10.1109/RusAutoCon54946.2022.9896390    
+
 # ENG
 
 ## Combinational circuits: reliability
