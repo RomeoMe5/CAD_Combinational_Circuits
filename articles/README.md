@@ -1,1 +1,2 @@
-Dataset publications
+# Dataset publications		
+V. V. Zunin, A. Y. Romanov and R. A. Solovyev, "Developing Methods for Combinational Circuit Generation," 2022 International Russian Automation Conference (RusAutoCon), Sochi, Russian Federation, 2022, pp. 842-846, doi: https://doi.org/10.1109/RusAutoCon54946.2022.9896390
